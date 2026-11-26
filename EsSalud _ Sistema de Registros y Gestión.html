@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EsSalud | Sistema de Registros y Gestión</title>
+<style>
+:root{--bg:#f2f6fb;--surface:#fff;--ink:#14263f;--muted:#5d6f86;--line:#d8e1ec;--brand:#0b4f9c;--brand2:#0a7f8c;--danger:#b3261e;--ok:#1b7a43;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1724;--surface:#16223a;--ink:#e6edf7;--muted:#9fb0c8;--line:#27385a;--brand:#5aa2ff;--brand2:#4cc3cf;--danger:#ff8a80;--ok:#6fd49a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1724;--surface:#16223a;--ink:#e6edf7;--muted:#9fb0c8;--line:#27385a;--brand:#5aa2ff;--brand2:#4cc3cf;--danger:#ff8a80;--ok:#6fd49a;color-scheme:dark}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,-apple-system,Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+.hidden{display:none!important}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--brand);color:#fff;flex-wrap:wrap}
+header .logo{font-weight:800;font-size:20px;letter-spacing:.5px;background:#fff;color:var(--brand);border-radius:8px;padding:2px 10px}
+header .t{font-weight:600;flex:1;min-width:160px}
+header .who{font-size:14px;opacity:.95}
+.btn{border:0;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer;background:var(--brand);color:#fff}
+.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}
+header .btn{background:rgba(255,255,255,.18)}
+.btn.del{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:5px 10px}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--brand2);outline-offset:2px}
+main{max-width:1000px;margin:0 auto;padding:20px}
+.login{max-width:420px;margin:40px auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px}
+.login h1{margin:0 0 4px}
+label{display:block;font-weight:600;margin:14px 0 4px;font-size:14px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.demo{background:var(--bg);border-radius:8px;padding:10px 12px;font-size:13px;margin-top:16px;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);margin-top:14px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+nav button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600}
+nav button[aria-current="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px}
+.panel h2{margin:0 0 12px;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.stat{flex:1;min-width:130px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brand2);border-radius:10px;padding:12px 16px}
+.stat b{font-size:26px;display:block}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:14px}
+th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--line)}
+.tag.ok{color:var(--ok);border-color:var(--ok)}
+.tag.off{color:var(--danger);border-color:var(--danger)}
+.empty{color:var(--muted);padding:14px 0}
+.msg{margin-top:12px;font-weight:600;min-height:1.4em}
+.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">ES</span>
+  <span class="t">EsSalud | Gestión hospitalaria</span>
+  <span class="who" id="who">Modo demostración · Invitado</span>
+  <button class="btn hidden" id="logout">Salir</button>
+</header>
+
+<main>
+<section class="login" id="login">
+  <h1>Bienvenido</h1>
+  <p style="color:var(--muted);margin:0">Ingresa al prototipo académico para gestionar citas y atenciones.</p>
+  <label for="role">Ingresar como</label>
+  <select id="role">
+    <option value="paciente">Asegurado / Paciente</option>
+    <option value="medico">Médico</option>
+    <option value="admision">Admisionista</option>
+    <option value="admin">Administrador</option>
+  </select>
+  <label for="email">Correo de demostración</label>
+  <input id="email" type="email" value="paciente@demo.pe" autocomplete="off">
+  <label for="pass">Contraseña</label>
+  <input id="pass" type="password" value="demo123" autocomplete="off">
+  <p class="msg err" id="loginMsg" role="alert"></p>
+  <button class="btn" id="enter" style="width:100%">Ingresar al sistema</button>
+  <div class="demo"><b>Acceso de demostración</b><br>Contraseña: <b>demo123</b><br>
+  Paciente: paciente@demo.pe · Médico: medico@demo.pe<br>Admisión: admision@demo.pe · Admin: admin@demo.pe</div>
+  <p class="note">Prototipo académico con datos ficticios. No es un portal oficial de EsSalud.</p>
+</section>
+
+<section id="app" class="hidden">
+  <nav id="nav"></nav>
+  <div id="view"></div>
+</section>
+</main>
+
+<script>
+var SPECS=["Medicina General","Cardiología","Pediatría","Ginecología","Traumatología","Dermatología","Neurología","Oftalmología","Psiquiatría","Odontología"];
+var DEF_DOCS=[
+ {id:1,nombre:"Dra. Rosa Medina Quispe",cmp:"45821",esp:"Medicina General",correo:"medico@demo.pe",tel:"987654321",turno:"Mañana",activo:true},
+ {id:2,nombre:"Dr. Luis Paredes Ramos",cmp:"51234",esp:"Cardiología",correo:"lparedes@demo.pe",tel:"986123456",turno:"Tarde",activo:true},
+ {id:3,nombre:"Dra. Ana Torres Vega",cmp:"48765",esp:"Pediatría",correo:"atorres@demo.pe",tel:"985321654",turno:"Mañana",activo:true}];
+var DEF_CITAS=[
+ {id:1,paciente:"paciente@demo.pe",doc:1,fecha:"2026-12-02",hora:"09:00",estado:"Programada"},
+ {id:2,paciente:"paciente@demo.pe",doc:2,fecha:"2026-12-05",hora:"15:30",estado:"Programada"}];
+var USERS={paciente:"paciente@demo.pe",medico:"medico@demo.pe",admision:"admision@demo.pe",admin:"admin@demo.pe"};
+var LABEL={paciente:"Paciente",medico:"Médico",admision:"Admisionista",admin:"Administrador"};
+var db={docs:DEF_DOCS,citas:DEF_CITAS};
+try{var s=localStorage.getItem("essalud_db");if(s){var p=JSON.parse(s);if(p&&p.docs&&p.citas)db=p;}}catch(e){}
+function save(){try{localStorage.setItem("essalud_db",JSON.stringify(db));}catch(e){}}
+var user=null,tab="";
+var $=function(i){return document.getElementById(i)};
+function esc(t){var d=document.createElement("div");d.textContent=t==null?"":String(t);return d.innerHTML}
+function docName(id){var d=db.docs.filter(function(x){return x.id===id})[0];return d?d.nombre+" · "+d.esp:"(médico eliminado)"}
+function nextId(a){return a.reduce(function(m,x){return Math.max(m,x.id)},0)+1}
+
+$("role").onchange=function(){$("email").value=USERS[$("role").value]};
+$("enter").onclick=function(){
+  var r=$("role").value,e=$("email").value.trim().toLowerCase();
+  if(e!==USERS[r]||$("pass").value!=="demo123"){$("loginMsg").textContent="Correo o contraseña incorrectos. Usa los datos de demostración.";return}
+  user={role:r,email:e};tab="";
+  $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
+  $("who").textContent=LABEL[r]+" · "+e;render();
+};
+$("logout").onclick=function(){user=null;$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");$("who").textContent="Modo demostración · Invitado";$("loginMsg").textContent=""};
+
+var TABS={paciente:["Mis citas","Reservar cita","Especialistas"],medico:["Mi agenda","Especialistas"],admision:["Registrar cita","Todas las citas","Especialistas"],admin:["Resumen","Gestionar médicos","Todas las citas"]};
+function render(){
+  var t=TABS[user.role];if(!tab||t.indexOf(tab)<0)tab=t[0];
+  $("nav").innerHTML=t.map(function(x){return '<button data-t="'+x+'" aria-current="'+(x===tab)+'">'+x+'</button>'}).join("");
+  Array.prototype.forEach.call($("nav").children,function(b){b.onclick=function(){tab=b.dataset.t;render()}});
+  var v=$("view");
+  if(tab==="Mis citas")v.innerHTML=citasTable(function(c){return c.paciente===user.email},true);
+  else if(tab==="Reservar cita"||tab==="Registrar cita"){v.innerHTML=formCita(user.role==="admision");bindCita()}
+  else if(tab==="Todas las citas")v.innerHTML=citasTable(function(){return true},true);
+  else if(tab==="Mi agenda"){var me=db.docs.filter(function(d){return d.correo===user.email})[0];v.innerHTML=me?citasTable(function(c){return c.doc===me.id},false):'<div class="panel empty">Tu correo no está vinculado a un médico registrado.</div>'}
+  else if(tab==="Especialistas")v.innerHTML=docsTable(false);
+  else if(tab==="Resumen")v.innerHTML=resumen();
+  else if(tab==="Gestionar médicos"){v.innerHTML=formDoc()+docsTable(true);bindDoc()}
+  bindCancel();
+}
+function citasTable(f,showDoc){
+  var rows=db.citas.filter(f).sort(function(a,b){return (a.fecha+a.hora)<(b.fecha+b.hora)?-1:1});
+  var h='<div class="panel"><h2>'+tab+'</h2>';
+  if(!rows.length)return h+'<p class="empty">No hay citas para mostrar.</p></div>';
+  h+='<div class="tw"><table><tr><th>Fecha</th><th>Hora</th><th>Paciente</th>'+(showDoc?'<th>Médico</th>':'')+'<th>Estado</th><th></th></tr>';
+  rows.forEach(function(c){h+='<tr><td>'+esc(c.fecha)+'</td><td>'+esc(c.hora)+'</td><td>'+esc(c.paciente)+'</td>'+(showDoc?'<td>'+esc(docName(c.doc))+'</td>':'')+'<td><span class="tag '+(c.estado==="Cancelada"?"off":"ok")+'">'+c.estado+'</span></td><td>'+(c.estado==="Programada"&&user.role!=="medico"?'<button class="btn del" data-c="'+c.id+'">Cancelar</button>':'')+'</td></tr>'});
+  return h+'</table></div></div>';
+}
+function bindCancel(){Array.prototype.forEach.call(document.querySelectorAll("[data-c]"),function(b){b.onclick=function(){var id=+b.dataset.c;db.citas.forEach(function(c){if(c.id===id)c.estado="Cancelada"});save();render()}})}
+function docOpts(){return db.docs.filter(function(d){return d.activo}).map(function(d){return '<option value="'+d.id+'">'+esc(d.nombre)+' — '+esc(d.esp)+' ('+esc(d.turno)+')</option>'}).join("")}
+function formCita(adm){return '<div class="panel"><h2>'+tab+'</h2><div class="grid">'+
+ (adm?'<div><label for="cp">Correo del paciente</label><input id="cp" type="email" placeholder="paciente@correo.pe"></div>':'')+
+ '<div><label for="cd">Médico / especialista</label><select id="cd">'+docOpts()+'</select></div>'+
+ '<div><label for="cf">Fecha</label><input id="cf" type="date"></div>'+
+ '<div><label for="ch">Hora</label><input id="ch" type="time" value="09:00"></div></div>'+
+ '<p class="msg" id="cm" role="alert"></p><button class="btn" id="cs">Confirmar cita</button></div>'}
+function bindCita(){$("cs").onclick=function(){
+  var p=user.role==="admision"?$("cp").value.trim().toLowerCase():user.email,m=$("cm");m.className="msg err";
+  if(!p){m.textContent="Escribe el correo del paciente.";return}
+  if(!$("cd").value){m.textContent="No hay médicos activos disponibles.";return}
+  if(!$("cf").value){m.textContent="Elige una fecha.";return}
+  var d=+$("cd").value,f=$("cf").value,h=$("ch").value;
+  if(db.citas.some(function(c){return c.doc===d&&c.fecha===f&&c.hora===h&&c.estado==="Programada"})){m.textContent="Ese horario ya está ocupado. Elige otra hora.";return}
+  db.citas.push({id:nextId(db.citas),paciente:p,doc:d,fecha:f,hora:h,estado:"Programada"});save();m.className="msg ok";m.textContent="Cita confirmada para el "+f+" a las "+h+"."}}
+function docsTable(manage){
+  var h='<div class="panel"><h2>'+(manage?"Médicos registrados":"Especialistas")+'</h2>';
+  var rows=manage?db.docs:db.docs.filter(function(d){return d.activo});
+  if(!rows.length)return h+'<p class="empty">Aún no hay médicos registrados.</p></div>';
+  h+='<div class="tw"><table><tr><th>Nombre</th><th>CMP</th><th>Especialidad</th><th>Turno</th>'+(manage?'<th>Contacto</th><th>Estado</th><th></th>':'')+'</tr>';
+  rows.forEach(function(d){h+='<tr><td>'+esc(d.nombre)+'</td><td>'+esc(d.cmp)+'</td><td>'+esc(d.esp)+'</td><td>'+esc(d.turno)+'</td>'+(manage?'<td>'+esc(d.correo)+'<br>'+esc(d.tel)+'</td><td><span class="tag '+(d.activo?"ok":"off")+'">'+(d.activo?"Activo":"Inactivo")+'</span></td><td class="row"><button class="btn alt" data-tg="'+d.id+'">'+(d.activo?"Desactivar":"Activar")+'</button><button class="btn del" data-dd="'+d.id+'">Eliminar</button></td>':'')+'</tr>'});
+  return h+'</table></div></div>';
+}
+function formDoc(){return '<div class="panel"><h2>Agregar médico / especialista</h2><div class="grid">'+
+ '<div><label for="dn">Nombre completo</label><input id="dn" placeholder="Dr. Juan Pérez Soto"></div>'+
+ '<div><label for="dc">N.º de colegiatura (CMP)</label><input id="dc" inputmode="numeric" maxlength="6" placeholder="12345"></div>'+
+ '<div><label for="de">Especialidad</label><select id="de">'+SPECS.map(function(s){return '<option>'+s+'</option>'}).join("")+'</select></div>'+
+ '<div><label for="dt">Turno</label><select id="dt"><option>Mañana</option><option>Tarde</option><option>Noche</option></select></div>'+
+ '<div><label for="dm">Correo</label><input id="dm" type="email" placeholder="medico@correo.pe"></div>'+
+ '<div><label for="dp">Teléfono</label><input id="dp" inputmode="tel" maxlength="9" placeholder="987654321"></div></div>'+
+ '<p class="msg" id="dg" role="alert"></p><button class="btn" id="da">Agregar médico</button></div>'}
+function bindDoc(){
+  $("da").onclick=function(){
+    var n=$("dn").value.trim(),c=$("dc").value.trim(),m=$("dm").value.trim().toLowerCase(),t=$("dp").value.trim(),g=$("dg");g.className="msg err";
+    if(n.length<5){g.textContent="Escribe el nombre completo del médico.";return}
+    if(!/^\d{4,6}$/.test(c)){g.textContent="El CMP debe tener entre 4 y 6 dígitos.";return}
+    if(!/^\S+@\S+\.\S+$/.test(m)){g.textContent="Escribe un correo válido.";return}
+    if(t&&!/^9\d{8}$/.test(t)){g.textContent="El teléfono debe tener 9 dígitos y empezar con 9.";return}
+    if(db.docs.some(function(d){return d.cmp===c})){g.textContent="Ya existe un médico con ese CMP.";return}
+    db.docs.push({id:nextId(db.docs),nombre:n,cmp:c,esp:$("de").value,correo:m,tel:t,turno:$("dt").value,activo:true});save();render();
+    var g2=$("dg");g2.className="msg ok";g2.textContent="Médico agregado: "+n+".";
+  };
+  Array.prototype.forEach.call(document.querySelectorAll("[data-tg]"),function(b){b.onclick=function(){var id=+b.dataset.tg;db.docs.forEach(function(d){if(d.id===id)d.activo=!d.activo});save();render()}});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-dd]"),function(b){b.onclick=function(){var id=+b.dataset.dd;if(!confirm("¿Eliminar este médico? Sus citas quedarán sin médico asignado."))return;db.docs=db.docs.filter(function(d){return d.id!==id});save();render()}});
+}
+function resumen(){
+  var act=db.citas.filter(function(c){return c.estado==="Programada"}).length;
+  return '<div class="stats"><div class="stat"><b>'+db.docs.length+'</b>Médicos registrados</div><div class="stat"><b>'+db.docs.filter(function(d){return d.activo}).length+'</b>Médicos activos</div><div class="stat"><b>'+act+'</b>Citas programadas</div><div class="stat"><b>'+new Set(db.docs.map(function(d){return d.esp})).size+'</b>Especialidades</div></div>'+docsTable(false);
+}
+</script>
+</body>
+</html>
